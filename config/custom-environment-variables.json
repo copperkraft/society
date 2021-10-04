@@ -1,0 +1,11 @@
+{
+  "port": "PORT",
+  "host": "HOST",
+  "privateKey": {
+    "value": "PRIVATE_KEY"
+  },
+  "publicKey": {
+    "value": "PUBLIC_KEY"
+  },
+  "mongoDbUrl": "MONGO_DB_URL"
+}

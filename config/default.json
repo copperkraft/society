@@ -1,0 +1,11 @@
+{
+  "port": 5000,
+  "host": "0.0.0.0",
+  "privateKey": {
+    "path": "./keys/private.pem"
+  },
+  "publicKey": {
+    "path": "./keys/public.pem"
+  },
+  "mongoDbUrl": "mongodb://localhost/mydb"
+}
