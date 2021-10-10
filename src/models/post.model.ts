@@ -1,10 +1,12 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
 class Post {
-  @prop({ required: true })
+  id!: string;
+
+  @prop({required: true})
   body!: string;
 
-  @prop({ required: true })
+  @prop({required: true})
   createdAt!: string;
 }
 
