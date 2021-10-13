@@ -1,18 +1,20 @@
-import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
 import config from 'config';
-import { typeDefs } from './src/graphql/typeDefs.graphql';
-import { resolvers } from './src/graphql/resolvers';
+import { buildSchema } from 'type-graphql';
+import { UserResolver } from './src/resolvers/user.resolver';
+import { ApolloServer } from 'apollo-server';
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
+async function bootstrap() {
+  const schema = await buildSchema({
+    resolvers: [UserResolver],
+  });
 
-mongoose.connect(config.get('mongoDbUrl'))
-  .then(() => {
-    return  server.listen({port: 5000})
-  })
-  .then(res => {
-    console.log(`Server running at ${res.url}`)
-  })
+  await mongoose.connect(config.get('mongoDbUrl'))
+
+  const server = new ApolloServer({ schema });
+
+  const { url } = await server.listen(config.get('port'));
+  console.log(`Server is running, GraphQL Playground available at ${url}`);
+}
+
+bootstrap();
