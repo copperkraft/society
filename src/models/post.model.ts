@@ -1,11 +1,16 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
+import { Field, ObjectType } from 'type-graphql';
 
-class Post {
+@ObjectType()
+export class Post {
+  @Field()
   id!: string;
 
+  @Field()
   @prop({required: true})
   body!: string;
 
+  @Field()
   @prop({required: true})
   createdAt!: string;
 }

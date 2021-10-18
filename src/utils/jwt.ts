@@ -1,6 +1,7 @@
 import config from 'config';
 import * as fs from 'fs';
 import { sign, verify } from 'jsonwebtoken';
+import { User } from '../models/user.model';
 
 const getKey = (keyConfig: { value: string } | { path: string }) => {
   if ('value' in keyConfig) {
@@ -17,10 +18,12 @@ const publicKey = getKey(config.get('publicKey'));
 
 export const signJWT = (payload: object) => sign(payload, privateKey, { algorithm: 'RS256' });
 
-export const verifyJWT = (token: string) => {
+export const signUserJWT = ({ id, username }: User) => signJWT({ id, username });
+
+export const decryptJWT = (token: string) => {
   const decrypted = verify(token, publicKey, { algorithms: ['RS256'] });
 
-  if (typeof decrypted === 'string') {
+  if (typeof decrypted !== 'object') {
     throw new Error('token should contain object');
   }
 

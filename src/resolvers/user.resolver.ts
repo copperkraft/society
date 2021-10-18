@@ -1,26 +1,29 @@
 import { User, UserModel } from '../models/user.model';
-import { signJWT } from '../utils/jwt';
+import { signUserJWT } from '../utils/jwt';
 import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { RegisterInput } from './inputs/register.input';
 import { UserInputError } from 'apollo-server';
 import { compare, genSalt, hash } from 'bcrypt';
 import { LoginInput } from './inputs/login.input';
+import { DocumentType } from '@typegoose/typegoose';
+import { Service } from 'typedi';
 
+const userToReturnObject = (user: DocumentType<User>) => ({
+  ...user.toObject(),
+  id: user.id,
+  token: signUserJWT(user),
+})
+
+@Service()
 @Resolver(User)
 export class UserResolver {
   @Query(() => User)
   async user(@Arg("id") id: string) {
     const user = await UserModel.findById(id);
     if (user === undefined) {
-      throw new Error('not found');
+      throw new UserInputError('not found');
     }
     return user;
-  }
-
-  // TODO: remove
-  @Query(() => [User])
-  users() {
-    return UserModel.find({}).exec();
   }
 
   @Mutation(() => User)
@@ -47,12 +50,7 @@ export class UserResolver {
       });
     }
 
-    const token = signJWT({
-      id: user.id,
-      username: user.username,
-    });
-
-    return {...user.toObject(), id: user.id, token };
+    return userToReturnObject(user);
   }
 
   @Mutation(() => User)
@@ -80,12 +78,10 @@ export class UserResolver {
         hashedPassword,
       });
 
-      const token = signJWT({
-        id: user.id,
-        username: user.username,
-      });
+      const token = signUserJWT(user);
+      const id = user.id;
 
-      return {...user.toObject(), id: user.id, token };
+      return {...user.toObject(), id, token };
     } catch (e) {
       console.log(e);
       throw new Error('Unable to create user');
